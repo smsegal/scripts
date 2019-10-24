@@ -7,12 +7,13 @@ if [ -z "$DEST" ]; then exit 1; fi
 watchman-wait --max-events 0 . |
 	# cat
 	while read -r file; do
-		echo "$file"
-		rsync -azvq \
-			--filter=':- .gitignore' \
-			"$file" "${DEST}"/"$file"
-		echo -n 'Completed at '
-		date
+		if git check-ignore "$file"; then
+			echo "$file is ignored"
+		else
+			echo "$file"
+			rsync -azvq \
+				"$file" "${DEST}"/"$file"
+			echo -n 'Completed at '
+			date
+		fi
 	done
-
-# --exclude '/.git' \
