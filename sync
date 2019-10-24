@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+DEST="$1"
+
+if [ -z "$DEST" ]; then exit 1; fi
+
+watchman-wait --max-events 0 . |
+	# cat
+	while read -r file; do
+		echo "$file"
+		rsync -azvq \
+			--filter=':- .gitignore' \
+			"$file" "${DEST}"/"$file"
+		echo -n 'Completed at '
+		date
+	done
+
+# --exclude '/.git' \

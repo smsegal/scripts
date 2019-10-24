@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+find . -path ./.git -prune -o -print |
+	git check-ignore --verbose --non-matching --stdin |
+	sed -n -e 's,\t./,\t,' -e 's,^::\t*,,p'
