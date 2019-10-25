@@ -1,11 +1,28 @@
 #!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# adapted from http://www.danplanet.com/blog/2012/05/09/low-latency-continuous-rsync/
+# Intended to sync a local directory to a remote server, using rsync to update a
+# file whenever a filesystem event is caught. Intended to be run in a git
+# repository, it will ignore changes to any files or directories that are
+# include in a .gitignore file.
+
+# Using watchman instead of inotify-tools to be able to run on macos as well as linux
+# Run as: sync $path_to_sync $destination
+# where $destination can be a remote host
+#
+# Significantly lower latency acheived by using ssh connection multiplexing with
+# the remote destination. In your ssh config for your desired host, add:
+# Host myhost.domain.com
+#     ControlMaster auto
+#     ControlPath /tmp/%h%p%r
 
 DEST="$1"
 
 if [ -z "$DEST" ]; then exit 1; fi
 
 watchman-wait --max-events 0 . |
-	# cat
 	while read -r file; do
 		if git check-ignore "$file"; then
 			echo "$file is ignored"
