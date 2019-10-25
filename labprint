@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 scp "$1" printer:~/to_print
-ssh printer /bin/bash << EOF
+ssh printer /bin/bash <<'EOF'
     cd ~/to_print
     lpr -P las2052 $(basename $1)
 EOF
-# echo ~/to_print/$1
-
