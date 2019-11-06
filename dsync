@@ -16,7 +16,7 @@ IFS=$'\n\t'
 # the remote destination. In your ssh config for your desired host, add:
 # Host myhost.domain.com
 #     ControlMaster auto
-#     ControlPath /tmp/%h%p%r
+#     ControlPath $HOME/.ssh/controlmasters/%h%p%r
 
 DEST="$1"
 
@@ -29,6 +29,7 @@ watchman-wait --max-events 0 . |
 		else
 			echo "$file"
 			rsync -azvq \
+                --exclude=".git/" \
 				"$file" "${DEST}"/"$file"
 			echo -n 'Completed at '
 			date
