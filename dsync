@@ -22,14 +22,30 @@ DEST="$1"
 
 if [ -z "$DEST" ]; then exit 1; fi
 
+array_contains() {
+	local array="$1[@]"
+	local seeking=$2
+	local in=1
+	for element in "${!array}"; do
+		if [[ $element == "$seeking" ]]; then
+			in=0
+			break
+		fi
+	done
+	return $in
+}
+
+declare -a exclude_files=(".git" ".empty" "index.lock")
+
 watchman-wait --max-events 0 . |
 	while read -r file; do
-		if git check-ignore "$file"; then
+		if git check-ignore "$file" || array_contains exclude_files "$file"; then
 			echo "$file is ignored"
 		else
 			echo "$file"
 			rsync -azvq \
-                --exclude=".git/" \
+				--exclude=".git/" \
+				--exclude=".empty" \
 				"$file" "${DEST}"/"$file"
 			echo -n 'Completed at '
 			date

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
 
 scp "$1" printer:~/to_print
 ssh printer /bin/bash <<'EOF'
