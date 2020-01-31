@@ -17,7 +17,8 @@ fuzzpass() {
         arg="password"
     fi
     local item
-    item=$(1pass | fzf);
+    item=$(1pass | fzf --preview="1pass -p {} username");
+    echo "$(1pass -p "$item" username)"
     [[ -n "$item" ]] && 1pass "$item" "$arg"
 }
 
