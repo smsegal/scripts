@@ -9,7 +9,7 @@ IFS=$'\n\t'
 # include in a .gitignore file.
 
 # Using watchman instead of inotify-tools to be able to run on macos as well as linux
-# Run as: sync $path_to_sync $destination
+# Run as: dsync $destination
 # where $destination can be a remote host
 #
 # Significantly lower latency acheived by using ssh connection multiplexing with
@@ -19,6 +19,9 @@ IFS=$'\n\t'
 #     ControlPath $HOME/.ssh/controlmasters/%h%p%r
 
 DEST="$1"
+
+IFS=":" read -ra REMOTE_DEST <<< "$DEST"
+echo "transferring files to ${REMOTE_DEST[0]} at ${REMOTE_DEST[1]}"
 
 if [ -z "$DEST" ]; then exit 1; fi
 
@@ -35,17 +38,19 @@ array_contains() {
 	return $in
 }
 
+# shellcheck disable=SC2034 #FP
 declare -a exclude_files=(".git" ".empty" "index.lock")
 
 watchman-wait --max-events 0 . |
 	while read -r file; do
-		if git check-ignore "$file" || array_contains exclude_files "$file"; then
+		if git check-ignore "$file" || array_contains exclude_files "$(basename "$file")"; then
 			echo "$file is ignored"
+		# elif [[ ! -e "$file" ]]; then
+		# 	ssh $REMOTE_DEST "rm ${REMOTE_DEST[1]}"/"$file"
+		# 	echo "$file was deleted from $REMOTE_DEST"
 		else
 			echo "$file"
 			rsync -azvq \
-				--exclude=".git/" \
-				--exclude=".empty" \
 				"$file" "${DEST}"/"$file"
 			echo -n 'Completed at '
 			date

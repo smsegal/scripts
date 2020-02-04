@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-scp "$1" printer:~/to_print
-ssh printer /bin/bash <<'EOF'
-    cd ~/to_print
-    lpr -P las2052 $(basename $1)
-EOF
+print_files=("$@")
+rsync -azvq "${print_files[@]}" printer:~/to_print
+# ssh printer /bin/zsh <<EOF
+# print_commands=()
+# for doc in "${print_files[@]}"; do
+# 	print_commands+=(lpr -P las2052 \'"${doc}"\' '\n')
+# done
+for doc in "${print_files[@]}"; do
+	echo lpr -P las2052 "~/to_print/\"${doc}\""
+done | ssh printer /bin/bash
