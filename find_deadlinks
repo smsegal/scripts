@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
+if [[ -n "$2" ]]; then
+    depth="$2"
+else
+    depth=10
+fi
 
-find "$1" -type l -exec test ! -e {} \; -print
+find "$1" -maxdepth "$depth" -type l -exec test ! -e {} \; -print
