@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+fd -t f ".*" "$HOME"/{Documents,School,Downloads} |
+	wofi --insensitive -d --prompt="Search" |
+	tr '\n' '\0' |
+	xargs -0 mimeo

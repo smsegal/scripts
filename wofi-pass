@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+1pass | wofi --dmenu -i | xargs -0 1pass
