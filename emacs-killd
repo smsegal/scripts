@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-if [[ -n $(ps -ef | grep "emacs --daemon") ]]; then
-    echo "daemon found"
-    if $(emacsclient -e "(kill-emacs)"); then
-        echo "daemon killed"
-    fi
-fi
